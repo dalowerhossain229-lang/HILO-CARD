@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 });
 
 // 🎰 [উইনগো কালার ট্রেড ওরিজিনাল ডোমেইন সিঙ্ক]
-const MAIN_SITE_URL = "https://onrender.com"; 
+const MAIN_SITE_URL = "https://betlover247.onrender.com"; 
 
 // 🧠 ওরিজিনাল তাসের কার্ডের মেমোরি পয়েন্ট ডেক ভাই ভাই (Ace সর্বোচ্চ ১৪ পয়েন্ট ভাই)
 const cardDeck = [
