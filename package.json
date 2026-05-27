@@ -1,0 +1,19 @@
+{
+  "name": "hilo-card-casino-master",
+  "version": "1.0.0",
+  "description": "Premium 3D Card Flip Hi-Lo 95% RTP Balance Synced Game Engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "BETLOVER24",
+  "license": "ISC"
+}
