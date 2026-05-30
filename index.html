@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HI-LO CARD MASTER - ROYAL FORTUNE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 🎰 ক্যাসিনো হেডার প্যানেল (ব্যালেন্স বক্স সহ ১ শতভাগ ডাইস-৩ডি স্ট্যান্ডার্ডে নিখুঁত লক ভাই ভাই) -->
+    <div class="header">
+        <div class="brand">
+            <div class="name">HI-LO CARD</div>
+            <div class="game">ROYAL TABLE PREDICTION</div>
+        </div>
+        <div class="header-right">
+            <button class="sound-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
+            <div class="balance-box">৳ <span id="user-balance">0.00</span></div>
+        </div>
+    </div>
+
+    <!-- 🎰 লাইভ হাই-লো ডিলিং টেবিল বোর্ড এরিয়া ভাই ভাই -->
+    <div class="hilo-table-zone">
+        <!-- বর্তমান বেস কার্ড উইন্ডো -->
+        <div class="table-side-box base-glow">
+            <div class="side-title title-base">BASE CARD (বর্তমান তাস)</div>
+            <div class="cards-hand-display" id="base-card-container">
+                <img src="./cards/7_of_S.png" class="card-img-node" id="base-card-img" alt="Base Card">
+            </div>
+        </div>
+
+        <!-- টাইটেল মেগা নেক্সট জোন সিগন্যাল -->
+        <div style="display:flex; align-items:center; justify-content:center; font-weight:900; color:#f1c40f; font-size:20px; text-shadow:0 0 10px #f1c40f;">👉</div>
+
+        <!-- পরবর্তী নতুন কার্ড উইন্ডো -->
+        <div class="table-side-box next-glow">
+            <div class="side-title title-next">NEXT CARD (পরবর্তী তাস)</div>
+            <div class="cards-hand-display" id="next-card-container">
+                <div class="card-back-default">❓</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎯 বাজি ধরার প্রধান ২টি নিয়ন বেটিং বোর্ড ঘর (১.৯৫ ওডস কড়া লক ভাই ভাই) -->
+    <div class="betting-board">
+        <button class="bet-board-btn side-player-btn" id="board-HI" onclick="selectHiLoSide('HI')">
+            <span class="board-label">HI (ওপরে যাবে) ▲</span>
+            <span class="board-odds">x1.95</span>
+        </button>
+        <button class="bet-board-btn side-banker-btn" id="board-LO" onclick="selectHiLoSide('LO')">
+            <span class="board-label">LO (নিচে নামবে) ▼</span>
+            <span class="board-odds">x1.95</span>
+        </button>
+    </div>
+
+    <!-- 🏆 ইন-লাইন লাইভ স্কোরিং ও উইন-লস মেসেজ বার -->
+    <div class="win-status-container" id="win-status-box">
+        <span id="win-text-msg">পরবর্তী তাস ওপরে যাবে না নিচে নামবে প্রেডিক্ট করুন ভাই!</span>
+    </div>
+
+    <!-- 🎛️ কন্ট্রোল প্যানেল এরিয়া (৳১-৳২০০০0 প্লাস-মাইনাস ও DEAL বোতাম পাশাপাশি লক ভাই) -->
+    <div class="footer-controls">
+        <div class="play-section">
+            <div class="bet-selector">
+                <button class="bet-btn-nav" onclick="adjustBet('minus')">−</button>
+                <div style="text-align: center; width: 60px;">
+                    <div style="font-size: 9px; color: #aaa; font-weight: bold;">BET</div>
+                    <div style="font-size: 15px; font-weight: 900; color: #fff;" id="bet-display">৳৫০</div>
+                </div>
+                <button class="bet-btn-nav" onclick="adjustBet('plus')">+</button>
+            </div>
+
+            <button class="play-btn" id="spin-btn" onclick="handleHiLoDealAction()">DEAL</button>
+
+            <div class="icon-group">
+                <button class="icon-btn" id="auto-btn" onclick="toggleAuto()">🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔌 [উইনগো কালার ট্রেড সিঙ্ক - ইউনিভার্সাল সকেট ইঞ্জিন লাইব্রেরি ভাই] -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlUserId = urlParams.get('userId') || urlParams.get('id') || urlParams.get('username') || "guest_user";
+        const urlWallet = urlParams.get('wallet') || "main";
+        
+        const SERVER_URL = window.location.origin;
+
+        let balance = 0.00;
+        let currentBet = 50; 
+        let selectedSide = null; 
+        let isSpinning = false; 
+        let isAuto = false;
+        let isMuted = false;
+        let autoInterval = null;
+        
+        // 🚀 গেমের বেস কার্ড ভ্যালু ট্র্যাকার নোড (ডিফল্ট কার্ড ৭ ইস্কাপন = ৭ ভ্যালু)
+        let currentBaseCardValue = 7; 
+        let currentBaseCardObj = { value: 7, suit: "S" };
+
+        // 🚀 [মেগা ডাইনামিক ইমেজ পাথ ফিল্টার]: ছোট-বড় অক্ষর ও পূর্ণ নামের তাস এক শটে কনভার্ট ভাই ভাই!
+        function getCardHtmlString(cardObj) {
+            if (!cardObj) return "";
+            const val = cardObj.value;
+            const suitLetter = cardObj.suit ? cardObj.suit.toUpperCase() : "S";
+            const suitFullNames = { "S": "spades", "H": "hearts", "D": "diamonds", "C": "clubs" };
+            const suitFull = suitFullNames[suitLetter] || "spades";
+
+            return `<img src="./cards/${val}_of_${suitLetter}.png" class="card-img-node" alt="card" onerror="this.onerror=null; this.src='./cards/${val}_of_${suitFull}.png'; this.onerror=function(){ this.src='./cards/${val}_of_${suitLetter}.PNG'; this.onerror=function(){ this.src='./cards/${val}_of_${suitFull}.PNG'; } };">`;
+        }
+
+        // 🧠 [১ শতভাগ একুরেট হাই-লো ডিলিং এনিমেশন ইঞ্জিন ভাই ভাই]
+        function animateHiLoCardDealing(serverData) {
+            const nZone = document.getElementById("next-card-container");
+            const bZone = document.getElementById("base-card-container");
+            nZone.innerHTML = "";
+
+            // ১. পরবর্তী তাস প্লে ফ্রেমে ফ্লিপিং ভাই ভাই
+            setTimeout(() => {
+                playAudio('click');
+                const nCardDiv = document.createElement("div");
+                nCardDiv.className = "card-baccarat-animation-node";
+                nCardDiv.innerHTML = getCardHtmlString(serverData.nextCard);
+                nZone.appendChild(nCardDiv);
+                
+                // সমাপনী ফলাফল আউটপুট জোন ভাই ভাই
+                showFinalGameReward(serverData.status, serverData.winAmount, serverData.result, serverData.nextCard);
+            }, 500);
+        }
+
+        // 🛫 কোর DEAL বোতাম ট্রিগার অ্যাকশন গেটওয়ে ভাই ভাই
+        async function handleHiLoDealAction() {
+            if (isSpinning) return;
+            if (!selectedSide) {
+                alert("🚨 আগে বাজি ধরার যেকোনো ১টি দিক (HI বা LO) সিলেক্ট করুন ভাই!");
+                isAuto = false;
+                document.getElementById("auto-btn").classList.remove("active");
+                return;
+            }
+
+            isSpinning = true;
+            document.getElementById("spin-btn").disabled = true;
+            document.getElementById("win-status-box").className = "win-status-container";
+            document.getElementById("win-text-msg").innerText = "🃏 ডিলার পরবর্তী তাস ডিলিং করছে...";
+
+            playAudio('spin');
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/hilo-deal`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: urlUserId,
+                        amount: parseFloat(currentBet),
+                        wallet: urlWallet,
+                        prediction: selectedSide,
+                        baseCardValue: currentBaseCardValue
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data && data.success === true) {
+                    balance = parseFloat(data.balance);
+                    if (window.parent) window.parent.postMessage({ action: "refresh_wallet" }, "*");
+                    if (window.top) window.top.postMessage({ action: "refresh_wallet" }, "*");
+
+                    animateHiLoCardDealing(data);
+                } else {
+                    alert(data.message || "❌ Insufficient Balance! Please Recharge.");
+                    stopHiLoState();
+                }
+            } catch (err) {
+                alert("⚠️ সেশন আউট! আবার DEAL বোতাম চাপুন ভাই ভাই।");
+                stopHiLoState();
+            }
+        }
+
+                function showFinalGameReward(status, winAmount, winnerSide, nextCardObj) {
+            const msgBox = document.getElementById("win-status-box");
+            const textMsg = document.getElementById("win-text-msg");
+
+            if (status === "win") {
+                playAudio('win');
+                msgBox.className = "win-status-container win-glow-bar";
+                textMsg.innerText = `🏆 মেগা উইন!! তাস এসেছে: ${nextCardObj.value} [৳${winAmount}]`;
+            } else if (status === "push") {
+                playAudio('click');
+                msgBox.className = "win-status-container win-glow-bar";
+                textMsg.innerText = `🤝 হুবহু সেম তাস এসেছে (${nextCardObj.value})!! বাজি রিফান্ড [৳${winAmount}]`;
+            } else {
+                playAudio('wheel'); 
+                msgBox.className = "win-status-container lose-glow-bar";
+                textMsg.innerText = `❌ প্রেডিকশন ভুল! তাস এসেছে: ${nextCardObj.value}। বাজি লস!`;
+            }
+
+            document.getElementById("user-balance").innerText = balance.toFixed(2);
+            
+            // 🔄 [নেক্সট সাইকেল শিফটার]: বর্তমানের নতুন তাসটি পরবর্তী রাউন্ডের জন্য বেস তাস হয়ে যাবে ভাই ভাই!
+            setTimeout(() => {
+                const bZone = document.getElementById("base-card-container");
+                const nZone = document.getElementById("next-card-container");
+                
+                currentBaseCardValue = nextCardObj.value;
+                currentBaseCardObj = nextCardObj;
+                
+                bZone.innerHTML = getCardHtmlString(nextCardObj);
+                nZone.innerHTML = `<div class="card-back-default">❓</div>`;
+                
+                stopHiLoState();
+
+                if (isAuto) {
+                    autoInterval = setTimeout(() => {
+                        if (isAuto) handleHiLoDealAction();
+                    }, 2500); 
+                }
+            }, 1800);
+        }
+
+        if (typeof io !== 'undefined') {
+            const socket = io();
+            socket.on("balanceUpdate", (data) => {
+                if (data && data.username === urlUserId) {
+                    if (window.parent) window.parent.postMessage({ action: "refresh_wallet" }, "*");
+                    fetchLiveBalance();
+                }
+            });
+        }
+
+        async function fetchLiveBalance() {
+            try {
+                const response = await fetch(`${SERVER_URL}/api/hilo-balance?userId=${urlUserId}&wallet=${urlWallet}`);
+                const data = await response.json();
+                if (data && data.success) {
+                    balance = parseFloat(data.balance);
+                    document.getElementById("user-balance").innerText = balance.toFixed(2);
+                }
+            } catch (e) { console.error("Balance loading error pass"); }
+        }
+
+        window.onload = () => {
+            if (window.parent) window.parent.postMessage({ action: "refresh_wallet" }, "*");
+            fetchLiveBalance();
+        };
+
+        function selectHiLoSide(side) {
+            if (isSpinning) return;
+            selectedSide = side;
+            document.querySelectorAll(".bet-board-btn").forEach(b => b.classList.remove("active-side-bet"));
+            document.getElementById(`board-${side}`).classList.add("active-side-bet");
+            playAudio('click');
+        }
+
+        function adjustBet(action) {
+            if (isSpinning) return;
+            if (action === 'minus' && currentBet > 1) {
+                if (currentBet <= 10) currentBet -= 1;
+                else if (currentBet <= 100) currentBet -= 10;
+                else if (currentBet <= 1000) currentBet -= 100;
+                else currentBet -= 500;
+            }
+            if (action === 'plus' && currentBet < 20000) {
+                if (currentBet < 10) currentBet += 1;
+                else if (currentBet < 100) currentBet += 10;
+                else if (currentBet < 1000) currentBet += 100;
+                else currentBet += 500;
+            }
+            if (currentBet < 1) currentBet = 1;
+            if (currentBet > 20000) currentBet = 20000;
+            
+            document.getElementById("bet-display").innerText = `৳${currentBet}`;
+            playAudio('click');
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById("mute-btn").innerText = isMuted ? "🔇" : "🔊";
+            document.getElementById("mute-btn").classList.toggle("muted-active", isMuted);
+            slotSounds.click.muted = isMuted;
+            slotSounds.spin.muted = isMuted;
+            slotSounds.win.muted = isMuted;
+            slotSounds.wheel.muted = isMuted;
+        }
+
+        function toggleAuto() {
+            isAuto = !isAuto;
+            document.getElementById("auto-btn").classList.toggle("active", isAuto);
+            if (isAuto && !isSpinning) handleHiLoDealAction();
+            playAudio('click');
+        }
+
+        function stopHiLoState() {
+            isSpinning = false;
+            document.getElementById("spin-btn").disabled = false;
+            if (!isAuto && autoInterval) clearTimeout(autoInterval);
+        }
+
+        // 🎯 [৪টি ওরিজিনাল প্রিমিয়াম ক্যাসিনো সাউন্ড ও বাফার গেটওয়ে লক ভাই ভাই]
+        const slotSounds = {
+            click: new Audio('click2.mp3'),
+            spin: new Audio('spin2.mp3'),
+            win: new Audio('win2.mp3'),
+            wheel: new Audio('wheel1.mp3')
+        };
+        Object.values(slotSounds).forEach(s => s.load());
+
+        function playAudio(type) { 
+            if (isMuted) return; 
+            try { 
+                slotSounds[type].currentTime = 0; 
+                slotSounds[type].play(); 
+            } catch(e){} 
+        }
+    </script>
+</body>
+</html>
