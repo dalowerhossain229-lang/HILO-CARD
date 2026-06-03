@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 });
 
 // 🎰 [উইনগো কালার ট্রেড ওরিজিনাল ডোমেইন সিঙ্ক ভাই ভাই]
-const MAIN_SITE_URL = "https://onrender.com"; 
+const MAIN_SITE_URL = "https://betlover247.onrender.com"; 
 const cardSuitsPool = ["HEARTS", "DIAMONDS", "CLUBS", "SPADES"];
 
 // প্রতিটি ইউজারের কারেন্ট রানিং বেস কার্ড ট্র্যাক মেমোরি নোড
@@ -209,7 +209,7 @@ io.on('connection', (socket) => {
 });
 
 // ⚡ কাস্টম হাই-লো নোড সার্ভার পোর্ট গেটওয়ে লাইভ অন ফায়ার
-const PORT = process.env.PORT || 30000;
+const PORT = process.env.PORT || 20000;
 server.listen(PORT, () => {
     console.log(`🎡 Hi-Lo Master Engine Running on port ${PORT}`);
 });
