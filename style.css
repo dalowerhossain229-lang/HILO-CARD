@@ -1,0 +1,312 @@
+/* ===================================================================================
+   🎰 HI-LO CARD - PREMIUM CASINO ARENA STYLESHEET (১০০% মোবাইল রেস্পন্সিভ বর্ম)
+   =================================================================================== */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #05070a;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #ffffff;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+/* 🔒 [মেগা কিলার হেডার ব্লকার বর্ম ভাই ভাই]: লবির মেইন হেডারের সাথে ডাবল ব্যালেন্স বক্স জ্যাম ওয়ান-শটে সাফ! */
+.header {
+    display: none !important;
+}
+
+/* 🏟️ ক্যাসিনো মেইন গোল্ডেন-নিওন ডার্ক টেবিল ম্যাট সিঙ্ক */
+body {
+    background: radial-gradient(circle at center, #0f1422 0%, #05070a 100%);
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: url('bg.png') no-repeat center center/cover;
+    opacity: 0.12;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* 🎰 কারেন্ট ও নেক্সট কার্ড ক্যাসিনো গ্রিড প্যানেল লেআউট চ্যাম */
+.board-dealing-zone {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 10px;
+    gap: 12px;
+    flex: 1;
+    min-height: 190px;
+    margin-top: 15px;
+}
+
+.board-column {
+    flex: 1;
+    background: rgba(8, 12, 21, 0.85);
+    border: 1px solid rgba(255,255,255,0.03);
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.7);
+}
+
+.base-card-glow {
+    box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.05);
+}
+
+.result-card-glow {
+    box-shadow: inset 0 0 15px rgba(244, 63, 94, 0.05);
+}
+
+.column-header-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.header-player {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.header-banker {
+    background: rgba(244, 63, 94, 0.15);
+    color: #f43f5e;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+/* 📱 তাসের কার্ড প্রিমিয়াম শোডাউন গ্রিড ওভারল্যাপ */
+.cards-display-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 110px;
+    width: 100%;
+}
+
+/* 🃏 কার্ড ফ্লিপ হওয়া এনিমেশন নোড */
+.card-deal-animation-node {
+    animation: dealIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transform: scale(0);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+@keyframes dealIn {
+    to { transform: scale(1); }
+}
+
+/* 🃏 ডিফল্ট উল্টানো কার্ডের ব্যাকগ্রাউন্ড ডিজাইন */
+.card-back-default {
+    width: 75px;
+    height: 105px;
+    background: #151821 url('card-back.png') no-repeat center center/cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    border-radius: 6px;
+}
+
+/* 💸 বাji রাখার প্রধান প্রেডিকশন নিয়ন মডিউল বোতাম চ্যাম */
+.betting-board {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    gap: 12px;
+}
+
+.bet-board-btn {
+    flex: 1;
+    background: linear-gradient(180deg, #161a26 0%, #0d1017 100%);
+    border: 2px solid #242d42;
+    border-radius: 12px;
+    padding: 14px 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.board-label {
+    font-size: 14px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.board-odds {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffaa00;
+}
+
+/* 🎯 যখন বাটন দুটি একুরেট সচল (Active) হবে—তখন এই গোল্ডেন নিয়ন গ্লো জ্বলবে ওস্তাদ! */
+.bet-board-btn:not(:disabled) {
+    border-color: #ffaa00;
+    background: linear-gradient(180deg, #2a2213 0%, #151008 100%);
+    box-shadow: 0 0 12px rgba(255, 170, 0, 0.35);
+}
+
+.bet-board-btn:not(:disabled) .board-label {
+    color: #ffaa00;
+}
+
+/* 📢 লাইভ মেসেজ স্ট্যাটাস বার */
+.win-status-container {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    padding: 10px;
+    margin: 10px;
+    background: rgba(9, 12, 18, 0.6);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.02);
+}
+
+#win-text-msg {
+    font-size: 12px;
+    font-weight: 700;
+    color: #38bdf8;
+    letter-spacing: 0.3px;
+}
+
+/* 🎛️ নিচের মেইন গেম কন্ট্রোল প্যানেল ফুটার */
+.footer-controls {
+    position: relative;
+    z-index: 10;
+    background: #07090e;
+    border-top: 1px solid #161b29;
+    padding: 12px 15px 25px 15px;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.6);
+}
+
+.play-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* প্লাস-মাইনাস নেভিগেশন নব */
+.bet-btn-nav {
+    background: #111522;
+    border: 1px solid #20293d;
+    color: #ffaa00;
+    font-size: 18px;
+    font-weight: 800;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 🚀 মেইন ডিল অ্যাকশন বোতাম (DEAL কিলার গোল্ডেন গ্লো) */
+.play-btn {
+    flex: 1;
+    background: linear-gradient(180deg, #ffbb00 0%, #d48800 100%);
+    color: #000000;
+    font-size: 15px;
+    font-weight: 900;
+    border: none;
+    padding: 11px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(212,136,0,0.3);
+    transition: all 0.15s ease;
+}
+
+.play-btn:active, .bet-board-btn:not(:disabled):active {
+    transform: scale(0.96);
+}
+
+.play-btn:disabled, .bet-board-btn:disabled {
+    background: #141721 !important;
+    border-color: #1f2536 !important;
+    color: #4b5563 !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+}
+
+/* 🤖 অটো স্পিন বোতাম আইকন গ্রিড */
+.icon-group {
+    display: flex;
+    align-items: center;
+}
+
+.icon-btn {
+    background: #111522;
+    border: 1px solid #20293d;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.icon-btn::before {
+    content: "🤖";
+    font-size: 15px;
+}
+
+.icon-btn.active {
+    background: #ffaa00;
+    border-color: #ffbb00;
+    box-shadow: 0 0 10px rgba(255,170,0,0.4);
+}
+
+.icon-btn.active::before {
+    filter: brightness(0);
+}
+
+/* 💥 উইন-লস নিয়ন গ্লোয়িং বর্ডার অ্যানিমেশন বর্ম */
+.win-glow-bar {
+    border-color: rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.05) !important;
+}
+
+.win-glow-bar #win-text-msg {
+    color: #00ff88 !important;
+}
+
+.lose-glow-bar {
+    border-color: rgba(255, 51, 102, 0.4) !important;
+    background: rgba(255, 51, 102, 0.05) !important;
+}
+
+.lose-glow-bar #win-text-msg {
+    color: #ff3366 !important;
+}
